@@ -220,6 +220,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b53cf0922ca2549ae8645023029fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 100
+  HeadPos: {fileID: 0}
 --- !u!1 &1382059462
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,9 +344,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c376e97b1bc9f54aa2d6092c91ff1aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 335215861}
+  player: {fileID: 335215861}
   viewDistance: 7.21
   viewAngle: 0
+  speed: 0
 --- !u!212 &1516114877
 SpriteRenderer:
   m_ObjectHideFlags: 0

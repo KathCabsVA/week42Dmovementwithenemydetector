@@ -4,63 +4,66 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
-{
-    Vector3 lastSeen;
-    Vector3 target;
 
-    public GameObject Player;
+{
+    Vector3 LastSeen;
+    Vector3 Target;
+
+    public GameObject player;
     public float viewDistance;
     public float viewAngle;
-    // Start is called before the first frame update
-    void Start()
+    public float speed;
+
+    private void Start()
     {
-        lastSeen = transform.position;
-        target = Player.transform.position;
+        LastSeen = transform.position;
+        Target = player.transform.position;
+    }
+    private void Update()
+    {
+        bool seen = seePlayer();
+
+        if (seen)
+        {
+            LastSeen = player.transform.position;
+            Target = LastSeen;
+        }
+        if (Vector3.Distance(transform.position, Target) < 0.5f)
+        {
+            Quaternion rotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+            Target = LastSeen + (rotation * transform.up * 5.0f);
+        }
+        else
+        {
+            Vector3 direcion = Target - transform.position;
+            float angle = Mathf.Atan2(-direcion.x, direcion.y) * Mathf.Rad2Deg;
+            Quaternion p = Quaternion.AngleAxis(angle, Vector3.forward);
+            transform.rotation = Quaternion.Lerp(transform.rotation, p, Time.deltaTime * 10f);
+
+            transform.position += transform.up * speed * Time.deltaTime;
+        }
+        Debug.DrawRay(transform.position, transform.up * viewDistance, seen ? Color.red : Color.yellow);
+
+        Quaternion uprayAngle = Quaternion.Euler(0, 0, -viewAngle);
+        Debug.DrawLine(transform.position, uprayAngle * transform.up * viewAngle, seen ? Color.red : Color.green);
+        Quaternion downrayAngle = Quaternion.Euler(0, 0, viewAngle);
+        Debug.DrawLine(transform.position, downrayAngle * transform.up * viewAngle, seen ? Color.red : Color.green);
     }
 
-    bool SeePlayer()
+    bool seePlayer()
     {
-        Vector3 dir = Player.transform.position = transform.position;
-        if (dir.magnitude > viewDistance)
-        {
-            Debug.Drawline(transform.position, transform.up * viewDistance, Color.green);
-            float angle = Vector3.Dot(transform.up, dir.normalized);
+        Vector3 dir = player.transform.position - transform.position;
 
-            if((Mathf.Acos(angle) * Mathf.Rad2Deg) < viewAngle)
+        if (dir.magnitude < viewDistance)
+        {
+            float angle = Vector3.Dot(transform.up, dir.normalized);
+            if ((Mathf.Acos(angle) * Mathf.Rad2Deg) < viewAngle)
             {
                 return true;
             }
             return true;
         }
         return false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        bool seen = SeePlayer();
-        //when we reach target
-        if (Vector3.Distance(transform.position, target) < 0.5f)
-        {
-
-            //at target, pick up new spot to go to
-            Quaternion rotation = Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)); //random movement in 360
-            target = lastSeen + (rotation * transform.up * 5.0f);
-        }
-        else
-        {
-            Vector3 dir = target - transform.position;
-            float angle = Mathf.Atan2(-dir.x, dir.y) * Mathf.Rad2Deg; //convert to radians to degrees
-            Quaternion p = Quaternion.AngleAxis(angle, Vector3.forward);
-            transform.rotation = Quaternion.Lerp(transform.rotation, p, Time.deltaTime * 10.0f);
-
-            transform.position += transform.position * 100.0f * Time.deltaTime; //make the enemy faster
-        }
-        Debug.DrawRay(transform.position, transform.up * viewDistance, seen? Color.red:Color.yellow, 0); //raycast
-        Quaternion rayAngle = Quaternion.Euler(0, 0, -viewAngle);
-        Debug.DrawRay(transform.position, rayAngle * transform.up * viewAngle, seen ? Color.red : Color.yellow);
-        rayAngle = Quaternion.Euler(0, 0, viewAngle);
-        Debug.DrawRay(transform.position, rayAngle * transform.up * viewAngle, seen? Color.red: Color.yellow);
     }
 
 }
